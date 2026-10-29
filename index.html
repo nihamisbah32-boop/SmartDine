@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartDine - Online Food Ordering</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #fffaf5;
+            color: #333;
+        }
+
+        header {
+            background: #e85d04;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 30px;
+        }
+
+        header p {
+            margin-top: 5px;
+        }
+
+        .cart-summary {
+            background: white;
+            color: #e85d04;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 45px 20px;
+            background: #ffe8d6;
+        }
+
+        .hero h2 {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: 17px;
+            color: #555;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .section-title {
+            font-size: 27px;
+            margin-bottom: 20px;
+            color: #9d3c00;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 16px;
+        }
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .category-btn {
+            border: 1px solid #e85d04;
+            background: white;
+            color: #e85d04;
+            padding: 10px 17px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .category-btn.active,
+        .category-btn:hover {
+            background: #e85d04;
+            color: white;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 22px;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .food-image {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 75px;
+            background: #fff0df;
+        }
+
+        .food-info {
+            padding: 18px;
+        }
+
+        .food-info h3 {
+            margin-bottom: 8px;
+        }
+
+        .food-info p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .food-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .price {
+            font-size: 19px;
+            font-weight: bold;
+            color: #e85d04;
+        }
+
+        button {
+            font-size: 14px;
+        }
+
+        .add-btn,
+        .primary-btn {
+            background: #e85d04;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover,
+        .primary-btn:hover {
+            background: #c94d00;
+        }
+
+        .cart-section {
+            margin-top: 45px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+        }
+
+        .customer-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item h4 {
+            margin-bottom: 5px;
+        }
+
+        .cart-item p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-controls button {
+            border: none;
+            background: #ffe8d6;
+            color: #9d3c00;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            color: #d00000 !important;
+            background: #ffe5e5 !important;
+        }
+
+        .bill-summary {
+            max-width: 400px;
+            margin-left: auto;
+            margin-top: 20px;
+        }
+
+        .bill-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .total-row {
+            font-size: 21px;
+            font-weight: bold;
+            color: #e85d04;
+            border-top: 2px solid #eee;
+            margin-top: 8px;
+            padding-top: 15px;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .secondary-btn {
+            background: #eee;
+            color: #333;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 25px 0;
+            color: #777;
+        }
+
+        footer {
+            background: #3d2417;
+            color: white;
+            text-align: center;
+            padding: 25px 15px;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 550px;
+            margin: 35px auto;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .modal-content h2 {
+            text-align: center;
+            color: #e85d04;
+            margin-bottom: 8px;
+        }
+
+        .bill-heading {
+            text-align: center;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .bill-details {
+            border-top: 1px dashed #aaa;
+            border-bottom: 1px dashed #aaa;
+            padding: 15px 0;
+            margin: 15px 0;
+        }
+
+        .bill-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 7px 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 25px;
+            }
+
+            .hero h2 {
+                font-size: 27px;
+            }
+
+            .cart-item {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 25px 15px;
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #billModal,
+            #billModal * {
+                visibility: visible;
+            }
+
+            #billModal {
+                display: block !important;
+                position: absolute;
+                inset: 0;
+                background: white;
+                padding: 0;
+                overflow: visible;
+            }
+
+            .modal-content {
+                margin: 0 auto;
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .modal-actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1>🍽️ SmartDine</h1>
+        <p>Online Food Ordering and Billing System</p>
+    </div>
+
+    <div class="cart-summary">
+        🛒 Cart: <span id="cartCount">0</span> items
+    </div>
+</header>
+
+<section class="hero">
+    <h2>Delicious Food, Delivered with Love!</h2>
+    <p>Explore our menu, select your favourites, and generate your bill.</p>
+</section>
+
+<main class="container">
+
+    <section id="menuSection">
+        <h2 class="section-title">Our Food Menu</h2>
+
+        <input
+            type="text"
+            id="searchInput"
+            class="search-box"
+            placeholder="🔍 Search for food..."
+            oninput="renderMenu()"
+            aria-label="Search food menu"
+        >
+
+        <div class="categories">
+            <button class="category-btn active" onclick="setCategory('All', this)">All</button>
+            <button class="category-btn" onclick="setCategory('Meals', this)">Meals</button>
+            <button class="category-btn" onclick="setCategory('Snacks', this)">Snacks</button>
+            <button class="category-btn" onclick="setCategory('Drinks', this)">Drinks</button>
+            <button class="category-btn" onclick="setCategory('Desserts', this)">Desserts</button>
+        </div>
+
+        <div class="menu-grid" id="menuGrid"></div>
+    </section>
+
+    <section class="cart-section" id="cartSection">
+        <h2 class="section-title">Your Order</h2>
+
+        <label for="customerName">Customer Name</label>
+        <input
+            type="text"
+            id="customerName"
+            class="customer-input"
+            placeholder="Enter your name"
+            maxlength="60"
+        >
+
+        <div id="cartItems"></div>
+
+        <div class="bill-summary">
+            <div class="bill-row">
+                <span>Subtotal</span>
+                <span id="subtotal">₹0.00</span>
+            </div>
+
+            <div class="bill-row">
+                <span>Delivery Fee</span>
+                <span id="deliveryFee">₹0.00</span>
+            </div>
+
+            <div class="bill-row total-row">
+                <span>Total</span>
+                <span id="total">₹0.00</span>
+            </div>
+        </div>
+
+        <div class="cart-actions">
+            <button class="primary-btn" onclick="generateBill()">
+                Generate Bill
+            </button>
+
+            <button class="secondary-btn" onclick="clearCart()">
+                Clear Order
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <h3>🍽️ SmartDine</h3>
+    <p>Online Food Ordering and Billing System</p>
+    <p>Fresh food. Great taste. Happy customers!</p>
+    <p>© 2026 SmartDine | Academic Microproject</p>
+</footer>
+
+<div class="modal" id="billModal" role="dialog" aria-modal="true" aria-labelledby="billTitle">
+    <div class="modal-content">
+
+        <h2 id="billTitle">🍽️ SmartDine</h2>
+        <p class="bill-heading">Customer Bill / Order Receipt</p>
+
+        <div id="billCustomerDetails"></div>
+
+        <div class="bill-details" id="billItems"></div>
+
+        <div id="billTotals"></div>
+
+        <p style="text-align:center; margin-top:20px;">
+            Thank you for ordering with SmartDine!
+        </p>
+
+        <div class="modal-actions">
+            <button class="primary-btn" onclick="window.print()">
+                Print Bill
+            </button>
+
+            <button class="secondary-btn" onclick="closeBill()">
+                Close
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const menu = [
+        {
+            id: 1,
+            name: "Burger",
+            price: 120,
+            category: "Meals",
+            emoji: "🍔",
+            description: "Delicious burger with fresh vegetables"
+        },
+        {
+            id: 2,
+            name: "Pizza",
+            price: 250,
+            category: "Meals",
+            emoji: "🍕",
+            description: "Cheesy pizza with tasty toppings"
+        },
+        {
+            id: 3,
+            name: "Sandwich",
+            price: 100,
+            category: "Snacks",
+            emoji: "🥪",
+            description: "Fresh and crispy vegetable sandwich"
+        },
+        {
+            id: 4,
+            name: "Pasta",
+            price: 180,
+            category: "Meals",
+            emoji: "🍝",
+            description: "Creamy pasta with delicious sauce"
+        },
+        {
+            id: 5,
+            name: "French Fries",
+            price: 80,
+            category: "Snacks",
+            emoji: "🍟",
+            description: "Golden and crispy potato fries"
+        },
+        {
+            id: 6,
+            name: "Cold Coffee",
+            price: 90,
+            category: "Drinks",
+            emoji: "🥤",
+            description: "Refreshing chilled coffee"
+        },
+        {
+            id: 7,
+            name: "Ice Cream",
+            price: 70,
+            category: "Desserts",
+            emoji: "🍨",
+            description: "Sweet and creamy ice cream"
+        },
+        {
+            id: 8,
+            name: "Fresh Juice",
+            price: 80,
+            category: "Drinks",
+            emoji: "🧃",
+            description: "Refreshing fruit juice"
+        }
+    ];
+
+    let cart = {};
+    let selectedCategory = "All";
+    let lastOrderNumber = 0;
+
+    function formatPrice(amount) {
+        return "₹" + amount.toFixed(2);
+    }
+
+    function setCategory(category, button) {
+        selectedCategory = category;
+
+        document.querySelectorAll(".category-btn").forEach(function (btn) {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+        renderMenu();
+    }
+
+    function renderMenu() {
+        const menuGrid = document.getElementById("menuGrid");
+        const searchText = document.getElementById("searchInput").value
+            .trim()
+            .toLowerCase();
+
+        const filteredMenu = menu.filter(function (item) {
+            const matchesCategory =
+                selectedCategory === "All" ||
+                item.category === selectedCategory;
+
+            const matchesSearch =
+                item.name.toLowerCase().includes(searchText) ||
+                item.description.toLowerCase().includes(searchText);
+
+            return matchesCategory && matchesSearch;
+        });
+
+        if (filteredMenu.length === 0) {
+            menuGrid.innerHTML =
+                '<p class="empty-message">No food items found.</p>';
+            return;
+        }
+
+        menuGrid.innerHTML = filteredMenu.map(function (item) {
+            return `
+                <article class="food-card">
+                    <div class="food-image">${item.emoji}</div>
+
+                    <div class="food-info">
+                        <h3>${item.name}</h3>
+                        <p>${item.description}</p>
+
+                        <div class="food-bottom">
+                            <span class="price">${formatPrice(item.price)}</span>
+
+                            <button
+                                class="add-btn"
+                                onclick="addToCart(${item.id})"
+                            >
+                                + Add
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }).join("");
+    }
+
+    function addToCart(id) {
+        if (cart[id]) {
+            cart[id].quantity++;
+        } else {
+            const item = menu.find(function (food) {
+                return food.id === id;
+            });
+
+            if (!item) {
+                return;
+            }
+
+            cart[id] = {
+                ...item,
+                quantity: 1
+            };
+        }
+
+        renderCart();
+    }
+
+    function changeQuantity(id, change) {
+        if (!cart[id]) {
+            return;
+        }
+
+        cart[id].quantity += change;
+
+        if (cart[id].quantity <= 0) {
+            delete cart[id];
+        }
+
+        renderCart();
+    }
+
+    function removeItem(id) {
+        delete cart[id];
+        renderCart();
+    }
+
+    function getSubtotal() {
+        return Object.values(cart).reduce(function (sum, item) {
+            return sum + item.price * item.quantity;
+        }, 0);
+    }
+
+    function getDeliveryFee(subtotal) {
+        return subtotal > 0 && subtotal < 300 ? 30 : 0;
+    }
+
+    function renderCart() {
+        const cartItems = document.getElementById("cartItems");
+        const items = Object.values(cart);
+
+        const count = items.reduce(function (sum, item) {
+            return sum + item.quantity;
+        }, 0);
+
+        document.getElementById("cartCount").textContent = count;
+
+        if (items.length === 0) {
+            cartItems.innerHTML =
+                '<p class="empty-message">Your cart is empty. Add some delicious food!</p>';
+        } else {
+            cartItems.innerHTML = items.map(function (item) {
+                return `
+                    <div class="cart-item">
+                        <div>
+                            <h4>${item.emoji} ${item.name}</h4>
+                            <p>${formatPrice(item.price)} each</p>
+                            <p>Item total: ${formatPrice(item.price * item.quantity)}</p>
+                        </div>
+
+                        <div class="quantity-controls">
+                            <button
+                                onclick="changeQuantity(${item.id}, -1)"
+                                aria-label="Decrease ${item.name} quantity"
+                            >−</button>
+
+                            <span>${item.quantity}</span>
+
+                            <button
+                                onclick="changeQuantity(${item.id}, 1)"
+                                aria-label="Increase ${item.name} quantity"
+                            >+</button>
+
+                            <button
+                                class="remove-btn"
+                                onclick="removeItem(${item.id})"
+                            >Remove</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        const subtotal = getSubtotal();
+        const delivery = getDeliveryFee(subtotal);
+        const total = subtotal + delivery;
+
+        document.getElementById("subtotal").textContent =
+            formatPrice(subtotal);
+
+        document.getElementById("deliveryFee").textContent =
+            formatPrice(delivery);
+
+        document.getElementById("total").textContent =
+            formatPrice(total);
+    }
+
+    function clearCart() {
+        if (Object.keys(cart).length === 0) {
+            alert("Your cart is already empty.");
+            return;
+        }
+
+        if (confirm("Are you sure you want to clear your order?")) {
+            cart = {};
+            renderCart();
+        }
+    }
+
+    function generateBill() {
+        const customerName = document
+            .getElementById("customerName")
+            .value.trim();
+
+        const items = Object.values(cart);
+
+        if (customerName === "") {
+            alert("Please enter the customer name.");
+            document.getElementById("customerName").focus();
+            return;
+        }
+
+        if (items.length === 0) {
+            alert("Please add at least one food item to your order.");
+            return;
+        }
+
+        lastOrderNumber++;
+
+        const subtotal = getSubtotal();
+        const delivery = getDeliveryFee(subtotal);
+        const total = subtotal + delivery;
+
+        const now = new Date();
+        const orderDate = now.toLocaleString("en-IN");
+
+        document.getElementById("billCustomerDetails").innerHTML = `
+            <p><strong>Customer:</strong> ${escapeHTML(customerName)}</p>
+            <p><strong>Order Number:</strong> SD-${String(lastOrderNumber).padStart(4, "0")}</p>
+            <p><strong>Date:</strong> ${orderDate}</p>
+        `;
+
+        document.getElementById("billItems").innerHTML = `
+            ${items.map(function (item) {
+                return `
+                    <div class="bill-item">
+                        <span>${item.name} × ${item.quantity}</span>
+                        <span>${formatPrice(item.price * item.quantity)}</span>
+                    </div>
+                `;
+            }).join("")}
+        `;
+
+        document.getElementById("billTotals").innerHTML = `
+            <div class="bill-row">
+                <span>Subtotal</span>
+                <span>${formatPrice(subtotal)}</span>
+            </div>
+
+            <div class="bill-row">
+                <span>Delivery Fee</span>
+                <span>${formatPrice(delivery)}</span>
+            </div>
+
+            <div class="bill-row total-row">
+                <span>Total Amount</span>
+                <span>${formatPrice(total)}</span>
+            </div>
+        `;
+
+        document.getElementById("billModal").style.display = "block";
+    }
+
+    function escapeHTML(value) {
+        return value.replace(/[&<>"']/g, function (character) {
+            const entities = {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            };
+
+            return entities[character];
+        });
+    }
+
+    function closeBill() {
+        document.getElementById("billModal").style.display = "none";
+    }
+
+    document.getElementById("billModal").addEventListener("click", function (event) {
+        if (event.target === this) {
+            closeBill();
+        }
+    });
+
+    renderMenu();
+    renderCart();
+</script>
+
+</body>
+</html>
